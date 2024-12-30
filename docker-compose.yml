@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: college_app_system
+    command: python3 run.py
+    volumes:
+      - .:/app
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_APP: run.py
+      FLASK_ENV: development
+      JWT_SECRET_KEY: your_secure_jwt_secret_key
+      MONGO_URI: mongodb://mongodb:27017/college_appointment_system
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: college_appointment_system
+
+volumes:
+  mongo_data:
