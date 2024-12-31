@@ -1,10 +1,15 @@
+import os
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
 from bson import ObjectId
 from datetime import datetime
 from typing import List
 
-client = MongoClient('mongodb://localhost:27017/')
+# Read MONGO_URI from environment variables
+MONGO_URI = os.getenv('MONGO_URI', 'mongodb://mongodb:27017/college_appointment_system')
+
+# Initialize MongoDB client
+client = MongoClient(MONGO_URI)
 db = client.college_appointment_system
 
 # Users Collection
