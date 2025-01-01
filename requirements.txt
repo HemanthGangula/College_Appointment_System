@@ -1,5 +1,8 @@
+# requirements.txt
 Flask
+PyMongo
+pytest
 flask-jwt-extended
-pymongo
 Werkzeug
 python-dotenv
+pydantic[email]

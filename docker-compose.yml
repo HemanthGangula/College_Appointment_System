@@ -1,3 +1,6 @@
+# docker-compose.yml (complete file)
+version: '3.8'
+
 services:
   web:
     build: .
@@ -8,33 +11,23 @@ services:
       - "5000:5000"
     env_file:
       - .env
-    environment:
-      FLASK_APP: run.py
-      FLASK_ENV: development
-      # JWT_SECRET_KEY and MONGO_URI are loaded from .env
     depends_on:
-      mongodb:
-        condition: service_healthy
+      - mongodb
     networks:
       - app-network
 
   mongodb:
-    image: mongo:6.0.5  # Specify a stable MongoDB version
+    image: mongo:6.0
     container_name: mongodb
     restart: always
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
     environment:
       MONGO_INITDB_DATABASE: college_appointment_system
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
     networks:
       - app-network
-    healthcheck:
-      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
 networks:
   app-network:

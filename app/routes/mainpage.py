@@ -1,7 +1,8 @@
-from flask import Blueprint
+# app/routes/mainpage.py
+from flask import Blueprint, render_template
 
 main_bp = Blueprint('main', __name__)
 
 @main_bp.route('/')
-def index():
-    return "Welcome to the College Appointment System"
+def home():
+    return "Welcome to the College Appointment System!"
