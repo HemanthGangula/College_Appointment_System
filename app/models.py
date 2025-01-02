@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from bson import ObjectId
 from datetime import datetime
 from typing import List
+# from flask_cors import CORS  # Remove this import
 
 # Load environment variables
 from dotenv import load_dotenv
@@ -15,6 +16,9 @@ load_dotenv()
 MONGO_URI = os.getenv('MONGO_URI', 'mongodb://mongodb:27017/college_appointment_system')
 client = MongoClient(MONGO_URI)
 db = client.college_appointment_system
+
+# Remove the incorrect CORS initialization
+# CORS(db)
 
 # User Functions
 def create_user(username: str, password: str, role: str, email: str) -> ObjectId:
@@ -119,6 +123,19 @@ def get_appointments(user_id: str, role: str, page: int = 1, limit: int = 10):
     except PyMongoError as e:
         print(f"Error fetching appointments: {e}")
         return []
+
+def update_appointment_status_in_db(appointment_id: str, status: str) -> bool:
+    if status not in ['accepted', 'canceled']:
+        return False
+    try:
+        result = db.appointments.update_one(
+            {"_id": ObjectId(appointment_id)},
+            {"$set": {"status": status}}
+        )
+        return result.modified_count > 0
+    except PyMongoError as e:
+        print(f"Error updating appointment status: {e}")
+        return False
 
 # Utility Functions
 def format_appointment(appointment):

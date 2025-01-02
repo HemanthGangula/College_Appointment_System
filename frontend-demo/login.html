@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - College Appointment System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Login</h1>
+    <nav>
+        <a href="index.html">Home</a> |
+        <a href="signup.html">Sign Up</a>
+    </nav>
+    <form id="login-form">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
+
+        <button type="submit">Login</button>
+    </form>
+    <p id="login-message"></p>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const data = {
+                username: e.target.username.value,
+                password: e.target.password.value
+            };
+
+            try {
+                const response = await fetch('http://localhost:5000/api/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                const message = document.getElementById('login-message');
+
+                if (response.status === 200) {
+                    message.style.color = 'green';
+                    message.textContent = 'Login successful!';
+                    // Store the token for future requests
+                    localStorage.setItem('access_token', result.access_token);
+                    // Redirect to dashboard
+                    window.location.href = 'dashboard.html';
+                } else {
+                    message.style.color = 'red';
+                    message.textContent = result.msg;
+                }
+            } catch (error) {
+                const message = document.getElementById('login-message');
+                message.style.color = 'red';
+                message.textContent = 'Server error. Please try again later.';
+            }
+        });
+    </script>
+</body>
+</html>

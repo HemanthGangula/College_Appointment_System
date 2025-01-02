@@ -27,7 +27,7 @@ def login():
 
     user = authenticate_user(username, password)
     if user:
-        access_token = create_access_token(identity=str(user["_id"]))
+        access_token = create_access_token(identity=str(user["_id"]), additional_claims={"role": user["role"]})
         return jsonify(access_token=access_token), 200
     else:
         return jsonify({"msg": "Invalid credentials"}), 401

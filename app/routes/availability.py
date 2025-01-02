@@ -2,6 +2,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.models import add_availability, get_availability
+from datetime import datetime
 
 availability_bp = Blueprint('availability', __name__)
 
@@ -12,6 +13,12 @@ def create_availability():
     professor_id = get_jwt_identity()
     date = data.get('date')
     time_slots = data.get('time_slots', [])
+
+    # Validate date format
+    try:
+        datetime.strptime(date, '%Y-%m-%d')
+    except ValueError:
+        return jsonify({"msg": "Invalid date format. Use YYYY-MM-DD."}), 400
 
     availability_id = add_availability(professor_id, date, time_slots)
     if availability_id:

@@ -6,3 +6,4 @@ flask-jwt-extended
 Werkzeug
 python-dotenv
 pydantic[email]
+flask_cors

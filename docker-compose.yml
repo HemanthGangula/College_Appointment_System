@@ -1,4 +1,3 @@
-# docker-compose.yml (complete file)
 version: '3.8'
 
 services:
@@ -26,6 +25,16 @@ services:
       - mongo_data:/data/db
     ports:
       - "27017:27017"
+    networks:
+      - app-network
+
+  frontend:
+    image: nginx:alpine
+    container_name: frontend
+    volumes:
+      - ./frontend-demo:/usr/share/nginx/html
+    ports:
+      - "8080:80"
     networks:
       - app-network
 

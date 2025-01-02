@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up - College Appointment System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Sign Up</h1>
+    <nav>
+        <a href="index.html">Home</a> |
+        <a href="login.html">Login</a>
+    </nav>
+    <form id="signup-form">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
+
+        <label for="role">Role:</label>
+        <select id="role" name="role" required>
+            <option value="">Select Role</option>
+            <option value="student">Student</option>
+            <option value="professor">Professor</option>
+        </select><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br>
+
+        <button type="submit">Sign Up</button>
+    </form>
+    <p id="signup-message"></p>
+
+    <script>
+        document.getElementById('signup-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const data = {
+                username: e.target.username.value,
+                password: e.target.password.value,
+                role: e.target.role.value,
+                email: e.target.email.value
+            };
+
+            try {
+                const response = await fetch('http://localhost:5000/api/signup', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                const message = document.getElementById('signup-message');
+
+                if (response.status === 201) {
+                    message.style.color = 'green';
+                    message.textContent = result.msg;
+                    // Redirect to login page after successful signup
+                    window.location.href = 'login.html';
+                } else {
+                    message.style.color = 'red';
+                    message.textContent = result.msg;
+                }
+            } catch (error) {
+                const message = document.getElementById('signup-message');
+                message.style.color = 'red';
+                message.textContent = 'Server error. Please try again later.';
+            }
+        });
+    </script>
+</body>
+</html>

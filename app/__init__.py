@@ -1,6 +1,7 @@
 # app/__init__.py
 from flask import Flask
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS  # Ensure this import is present
 from app.routes.auth import auth_bp
 from app.routes.availability import availability_bp
 from app.routes.appointments import appointments_bp
@@ -9,6 +10,7 @@ import os
 
 def create_app():
     app = Flask(__name__)
+    CORS(app)  # Enable CORS for the Flask app
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'default_secret_key')
     app.config['MONGO_URI'] = os.getenv('MONGO_URI', 'mongodb://localhost:27017/college_appointment_system')
 
@@ -18,6 +20,6 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix='/api')
     app.register_blueprint(availability_bp, url_prefix='/api')
     app.register_blueprint(appointments_bp, url_prefix='/api')
-    app.register_blueprint(main_bp)
+    app.register_blueprint(main_bp, url_prefix='/')
 
     return app

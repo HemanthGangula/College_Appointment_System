@@ -41,6 +41,11 @@
 - **Method:** `POST`
 - **Headers:** `Content-Type: application/json`
 - **Request Body:**
+    ```bash
+    curl -X POST http://localhost:5000/api/login \
+     -H "Content-Type: application/json" \
+     -d '{"username": "john_doe", "password": "securepassword123"}'
+    ```
     ```json
     {
         "username": "string",

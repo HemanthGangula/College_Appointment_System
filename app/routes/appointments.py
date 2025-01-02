@@ -1,7 +1,7 @@
 # app/routes/appointments.py
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.models import book_appointment, get_appointments
+from app.models import book_appointment, get_appointments, update_appointment_status_in_db
 
 appointments_bp = Blueprint('appointments', __name__)
 
@@ -34,3 +34,16 @@ def list_appointments():
         return jsonify(appointments), 200
     else:
         return jsonify({"msg": "Failed to retrieve appointments"}), 400
+
+@appointments_bp.route('/appointments/<appointment_id>/status', methods=['PUT'])
+@jwt_required()
+def update_appointment_status(appointment_id):
+    data = request.get_json()
+    status = data.get('status')  # 'accepted' or 'canceled'
+
+    # Logic to update appointment status
+    updated = update_appointment_status_in_db(appointment_id, status)
+    if updated:
+        return jsonify({"msg": "Appointment status updated."}), 200
+    else:
+        return jsonify({"msg": "Failed to update appointment."}), 400

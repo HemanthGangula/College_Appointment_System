@@ -1,0 +1,57 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+h1 {
+    color: #333;
+}
+
+nav a {
+    margin: 0 10px;
+    text-decoration: none;
+    color: #007BFF;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+form {
+    margin-top: 20px;
+}
+
+label {
+    display: inline-block;
+    width: 100px;
+    margin-bottom: 10px;
+}
+
+input, select {
+    padding: 5px;
+    width: 200px;
+}
+
+button {
+    padding: 5px 10px;
+    margin-top: 10px;
+}
+
+#signup-message, #login-message {
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+#availability-form {
+    margin-top: 20px;
+}
+
+#professors-list div {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+#professors-list button {
+    padding: 5px 10px;
+}
