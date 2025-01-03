@@ -88,12 +88,13 @@ def book_appointment(student_id: str, professor_id: str, date: str, time_slot: s
         if not availability:
             raise ValueError("The selected time slot is not available.")
 
-        # Create the appointment
+        # Create the appointment with initial status as 'pending'
         appointment = {
             "student_id": ObjectId(student_id),
             "professor_id": ObjectId(professor_id),
             "date": date,
             "time_slot": time_slot,
+            "status": "pending",
             "created_at": datetime.utcnow()
         }
 
@@ -156,5 +157,6 @@ def format_appointment(appointment):
         "professor_id": str(appointment["professor_id"]),
         "date": appointment["date"],
         "time_slot": appointment["time_slot"],
-        "created_at": appointment["created_at"]
+        "status": appointment.get("status", "pending"),
+        "created_at": appointment["created_at"].isoformat()
     }

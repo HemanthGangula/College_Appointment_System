@@ -29,14 +29,19 @@
             <button id="submit-availability">Submit</button>
         </div>
         <p id="availability-message"></p>
+
+        <h3>Pending Appointments</h3>
+        <div id="pending-appointments">
+            <!-- Pending appointments will be listed here -->
+        </div>
     </div>
 
     <!-- Student Section -->
     <div id="student-section" style="display: none;">
         <h2>Student Dashboard</h2>
         <button id="logout-button-student">Logout</button>
-        <div id="professors-list">
-            <!-- Professors and their availability will be listed here -->
+        <div id="appointments-list">
+            <!-- Appointments and their statuses will be listed here -->
         </div>
         <p id="appointment-message"></p>
     </div>
@@ -71,10 +76,12 @@
                 if (role === 'professor') {
                     document.getElementById('dashboard-title').textContent = 'Professor Dashboard';
                     document.getElementById('professor-section').style.display = 'block';
+                    loadProfessors();
+                    loadPendingAppointments();
                 } else if (role === 'student') {
                     document.getElementById('dashboard-title').textContent = 'Student Dashboard';
                     document.getElementById('student-section').style.display = 'block';
-                    loadProfessors();
+                    loadAppointments();
                 }
             } catch (error) {
                 console.error('Error decoding token:', error);
@@ -145,8 +152,8 @@
 
                 if (response.ok) {
                     const availability = await response.json();
-                    const professorsList = document.getElementById('professors-list');
-                    professorsList.innerHTML = ''; // Clear existing content
+                    const pendingList = document.getElementById('pending-appointments'); // Updated reference
+                    pendingList.innerHTML = ''; // Clear existing content
 
                     if (availability.length === 0) {
                         professorsList.textContent = 'No professors available at the moment.';
@@ -160,9 +167,9 @@
                                 <h3>Professor ID: ${slot.professor_id}</h3>
                                 <p>Date: ${slot.date}</p>
                                 <p>Available Slot: ${time_slot}</p>
-                                <button onclick="requestAppointment('${slot.professor_id}', '${slot.date}', '${time_slot}')">Request Appointment</button>
+                                <button onclick="requestAppointment('${slot.id}', '${slot.date}', '${time_slot}')">Request Appointment</button>
                             `;
-                            professorsList.appendChild(profDiv);
+                            pendingList.appendChild(profDiv);
                         });
                     });
                 } else {
@@ -174,6 +181,122 @@
                 const message = document.getElementById('appointment-message');
                 message.style.color = 'red';
                 message.textContent = 'Failed to load professors.';
+            }
+        }
+
+        async function loadPendingAppointments() {
+            try {
+                const token = localStorage.getItem('access_token');
+                const response = await fetch('http://localhost:5000/api/appointments?role=professor', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const appointments = await response.json();
+                    const pendingAppointments = appointments.filter(app => app.status === 'pending');
+                    const pendingList = document.getElementById('pending-appointments');
+                    pendingList.innerHTML = ''; // Clear existing content
+
+                if (pendingAppointments.length === 0) {
+                        pendingList.textContent = 'No pending appointments.';
+                        return;
+                }
+
+                pendingAppointments.forEach(app => {
+                        const appDiv = document.createElement('div');
+                        appDiv.innerHTML = `
+                            <h4>Student ID: ${app.student_id}</h4>
+                            <p>Date: ${app.date}</p>
+                            <p>Time Slot: ${app.time_slot}</p>
+                            <button onclick="updateAppointmentStatus('${app.id}', 'accepted')">Accept</button>
+                            <button onclick="updateAppointmentStatus('${app.id}', 'declined')">Decline</button>
+                        `;
+                        pendingList.appendChild(appDiv);
+                    });
+                } else {
+                    const message = document.getElementById('availability-message');
+                    message.style.color = 'red';
+                    message.textContent = 'Failed to load pending appointments.';
+                }
+            } catch (error) {
+                const message = document.getElementById('availability-message');
+                message.style.color = 'red';
+                message.textContent = 'Failed to load pending appointments.';
+            }
+        }
+
+        async function updateAppointmentStatus(appointment_id, status) {
+            try {
+                const token = localStorage.getItem('access_token');
+                const response = await fetch(`http://localhost:5000/api/appointments/${appointment_id}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ status })
+                });
+
+                const result = await response.json();
+                const message = document.getElementById('availability-message');
+
+                if (response.status === 200) {
+                    message.style.color = 'green';
+                    message.textContent = 'Appointment status updated successfully.';
+                    loadPendingAppointments(); // Refresh the pending appointments list
+                } else {
+                    message.style.color = 'red';
+                    message.textContent = result.msg;
+                }
+            } catch (error) {
+                const message = document.getElementById('availability-message');
+                message.style.color = 'red';
+                message.textContent = 'Server error. Please try again later.';
+            }
+        }
+
+        async function loadAppointments() {
+            try {
+                const token = localStorage.getItem('access_token');
+                const response = await fetch('http://localhost:5000/api/appointments', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const appointments = await response.json();
+                    const appointmentsList = document.getElementById('appointments-list');
+                    appointmentsList.innerHTML = ''; // Clear existing content
+
+                    if (appointments.length === 0) {
+                        appointmentsList.textContent = 'No appointments available at the moment.';
+                        return;
+                    }
+
+                    appointments.forEach(app => {
+                        const appDiv = document.createElement('div');
+                        appDiv.innerHTML = `
+                            <h4>Professor ID: ${app.professor_id}</h4>
+                            <p>Date: ${app.date}</p>
+                            <p>Time Slot: ${app.time_slot}</p>
+                            <p>Status: ${app.status}</p>
+                        `;
+                        appointmentsList.appendChild(appDiv);
+                    });
+                } else {
+                    const message = document.getElementById('appointment-message');
+                    message.style.color = 'red';
+                    message.textContent = 'Failed to load appointments.';
+                }
+            } catch (error) {
+                const message = document.getElementById('appointment-message');
+                message.style.color = 'red';
+                message.textContent = 'Failed to load appointments.';
             }
         }
 
@@ -203,5 +326,7 @@
                 message.style.color = 'red';
                 message.textContent = 'Server error. Please try again later.';
             }
-        }    </script></body>
+        }
+    </script>
+</body>
 </html>
