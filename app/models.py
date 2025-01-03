@@ -58,13 +58,23 @@ def add_availability(professor_id: str, date: str, time_slots: List[str]) -> Obj
         print(f"Error adding availability: {e}")
         return None
 
+def format_availability(availability):
+    return {
+        "id": str(availability["_id"]),
+        "professor_id": str(availability["professor_id"]),
+        "date": availability["date"],
+        "time_slots": availability["time_slots"],
+        "created_at": availability["created_at"].isoformat()
+    }
+
 def get_availability(date: str = None, professor_id: str = None):
     query = {}
     if date:
         query['date'] = date
     if professor_id:
         query['professor_id'] = ObjectId(professor_id)
-    return list(db.availability.find(query))
+    availability = list(db.availability.find(query))
+    return [format_availability(a) for a in availability]
 
 # Appointment Functions
 def book_appointment(student_id: str, professor_id: str, date: str, time_slot: str) -> ObjectId:
